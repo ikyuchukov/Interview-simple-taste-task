@@ -22,7 +22,7 @@ class UserRepository extends ServiceEntityRepository
     public function emailExists(string $email): bool
     {
         $result = $this->createQueryBuilder('u')
-            ->select('COUNT (id)')
+            ->select('COUNT (u.id)')
             ->where('u.email = :email')
             ->setParameter('email', $email)
             ->setMaxResults(1)
@@ -36,7 +36,7 @@ class UserRepository extends ServiceEntityRepository
     public function usernameExists(string $username): bool
     {
         $result = $this->createQueryBuilder('u')
-            ->select('COUNT (id)')
+            ->select('COUNT (u.id)')
             ->where('u.username = :username')
             ->setParameter('username', $username)
             ->setMaxResults(1)

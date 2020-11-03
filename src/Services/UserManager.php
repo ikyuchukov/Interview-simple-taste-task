@@ -8,13 +8,14 @@ use App\Entity\User;
 use App\Exceptions\UserAlreadyExistsException;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 
 class UserManager
 {
     private UserRepository $userRepository;
-    private EntityManager $entityManager;
+    private EntityManagerInterface $entityManager;
 
-    public function __construct(UserRepository $userRepository, EntityManager $entityManager)
+    public function __construct(UserRepository $userRepository, EntityManagerInterface $entityManager)
     {
         $this->userRepository = $userRepository;
         $this->entityManager = $entityManager;
