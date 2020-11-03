@@ -17,17 +17,17 @@ class Course
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
-    private $id;
+    private int $id;
 
     /**
      * @ORM\Column(type="string", length=255, unique=true)
      */
-    private $name;
+    private string $name;
 
     /**
      * @ORM\Column(type="string", length=255, unique=true)
      */
-    private $url;
+    private string $url;
 
     public function getId(): ?int
     {
