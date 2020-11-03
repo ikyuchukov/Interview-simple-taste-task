@@ -1,0 +1,42 @@
+version: '3.3'
+volumes:
+  db_data: {}
+services:
+  taste-ilian-php:
+    container_name: taste-ilian-php
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/var/www/html
+      - ~/.composer:/home/taste/.composer
+    expose:
+      - "9000"
+    environment:
+      MYSQL_ROOT_PASSWORD: r34llys3cur3Passw0rdr00t
+      MYSQL_DATABASE: taste
+      MYSQL_USER: taste
+      MYSQL_PASSWORD: r34llys3cur3Passw0rd
+  taste-ilian-nginx:
+    container_name: taste-ilian-nginx
+    image: nginx:1.19.3
+    volumes:
+     - ./:/var/www/html
+     - ./docker/config/site.conf:/etc/nginx/conf.d/default.conf
+    ports:
+     - "8080:80"
+    depends_on:
+      - taste-ilian-php
+  taste-ilian-db:
+    container_name: taste-ilian-db
+    image: mariadb:10.5.6-focal
+    restart: always
+    ports:
+    - "33060:3306"
+    volumes:
+    - db_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: r34llys3cur3Passw0rdr00t
+      MYSQL_DATABASE: taste
+      MYSQL_USER: taste
+      MYSQL_PASSWORD: r34llys3cur3Passw0rd
