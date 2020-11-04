@@ -21,19 +21,22 @@ class CourseManager
     private UserVisitRepository $userVisitRepository;
     private EntityManagerInterface $entityManager;
     private ContainerBagInterface $params;
+    private DateTimeImmutable $currentDate;
 
     public function __construct(
         CourseRepository $courseRepository,
         Authenticator $authenticator,
         UserVisitRepository $userVisitRepository,
         EntityManagerInterface $entityManager,
-        ContainerBagInterface $params
+        ContainerBagInterface $params,
+        DateTimeImmutable $currentDate
     ) {
         $this->courseRepository = $courseRepository;
         $this->authenticator = $authenticator;
         $this->userVisitRepository = $userVisitRepository;
         $this->entityManager = $entityManager;
         $this->params = $params;
+        $this->currentDate = $currentDate;
     }
 
     public function getCourseForUser(User $user, int $courseId): Course
@@ -56,25 +59,33 @@ class CourseManager
     {
         $userVisit = $this->userVisitRepository->findOneBy(['user' => $user]);
 
-        return $userVisit === null || $userVisit->getCounter() < $this->params->get('course_visits');
+        return
+            $userVisit === null
+            || $userVisit->getCounter() < $this->params->get('course_visits')
+            || $this->shouldResetUserVisits($userVisit)
+        ;
+    }
+
+    private function shouldResetUserVisits(UserVisit $userVisit): bool
+    {
+        return
+            $this->currentDate
+            >= $userVisit->getLastVisit()->add(new DateInterval($this->params->get('course_visit_reset')))
+        ;
     }
 
     private function createUserVisit(User $user)
     {
-        $currentDate = new DateTimeImmutable();
         $userVisit = $this->userVisitRepository->findOneBy(['user' => $user]);
         if ($userVisit !== null) {
-            if (
-                $currentDate
-                >= $userVisit->getLastVisit()->add(new DateInterval($this->params->get('course_visit_reset')))
-            ) {
+            if ($this->shouldResetUserVisits($userVisit)) {
                 $userVisit->setCounter(1);
             } else {
                 $userVisit->setCounter($userVisit->getCounter() + 1);
             }
-            $userVisit->setLastVisit($currentDate);
+            $userVisit->setLastVisit($this->currentDate);
         } else {
-            $userVisit = (new UserVisit())->setCounter(1)->setLastVisit($currentDate)->setUser($user);
+            $userVisit = (new UserVisit())->setCounter(1)->setLastVisit($this->currentDate)->setUser($user);
             $this->entityManager->persist($userVisit);
         }
     }
