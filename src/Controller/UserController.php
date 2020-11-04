@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Entity\User;
 use App\Exceptions\UserAlreadyExistsException;
 use App\Exceptions\UserNotFoundException;
 use App\Services\Authenticator;
