@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\User;
 use App\Entity\UserRoles;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -47,4 +48,19 @@ class UserRolesRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    public function isAdmin(User $user)
+    {
+         $result = $this->createQueryBuilder('u')
+                ->select('COUNT(u.id)')
+                ->andWhere('u.role = :role')
+                ->andWhere('u.user = :user')
+                ->setParameter('user', $user)
+                ->setParameter('role', UserRoles::ROLE_ADMIN)
+                ->getQuery()
+                ->getSingleScalarResult()
+            ;
+
+         return (bool) $result;
+    }
 }

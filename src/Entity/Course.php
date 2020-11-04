@@ -27,14 +27,14 @@ class Course
     /**
      * @ORM\Column(type="string", length=255, unique=true)
      */
-    private string $url;
+    private ?string $url = null;
 
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getName(): string
     {
         return $this->name;
     }
@@ -51,7 +51,7 @@ class Course
         return $this->url;
     }
 
-    public function setUrl(string $url): self
+    public function setUrl(?string $url): self
     {
         $this->url = $url;
 
