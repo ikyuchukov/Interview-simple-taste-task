@@ -36,3 +36,4 @@
         (user_id, `role`)
         VALUES(1, 'admin');
 
+* bin/phpunit to run tests
