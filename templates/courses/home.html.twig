@@ -6,7 +6,7 @@
 
     <div class="example-wrapper">
         {% for course in courses %}
-            <li><a href="/courses/">{{ course.id }}"{{ course.name }} {{ course.url }}</a></li>
+            <li><a href="/courses/{{ course.id }}">{{ course.name }} {{ course.url }}</a></li>
         {% endfor %}
     </div>
 {% endblock %}
