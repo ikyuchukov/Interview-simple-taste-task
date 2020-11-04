@@ -21,5 +21,11 @@
 * Run migrations
 
         bin/console doctrine:migrations:migrate
+        
+* Create fixtures (you can remove the argument to use default of 100)
+
+        bin/console app:create-course-fixtures 200
     
-    
+* Register at http://127.0.0.1:8080/register
+* Login at http://127.0.0.1:8080/login
+* Courses are available at http://127.0.0.1:8080/home    
