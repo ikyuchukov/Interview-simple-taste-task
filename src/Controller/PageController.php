@@ -47,6 +47,6 @@ class PageController extends AbstractController
     {
         $courses = $this->coursesRepository->findAll();
 
-        return $this->render('courses/home.html.twig', ['courses' => $courses];
+        return $this->render('courses/home.html.twig', ['courses' => $courses]);
     }
 }

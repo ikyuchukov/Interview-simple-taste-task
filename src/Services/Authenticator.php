@@ -23,14 +23,9 @@ class Authenticator
 
     public function authenticateUser(string $email, string $password)
     {
-        $user = $this->userRepository->findOneBy(
-            [
-                'email' => $email,
-                'password' => $this->userManager->hashPassword($password),
-            ]
-        );
+        $user = $this->userRepository->findOneBy(['email' => $email]);
 
-        if ($user !== null) {
+        if ($user !== null && password_verify($password, $user->getPassword())) {
             $session = new Session(new NativeSessionStorage(), new AttributeBag());
             $session->set('user_id', $user->getId());
         } else {

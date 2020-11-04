@@ -75,7 +75,8 @@ class UserController extends AbstractController
         if ($this->userDataValidation->isUserLoginDataValid($userData)) {
             try {
                 $this->authenticator->authenticateUser($userData['email'], $userData['password']);
-                $this->redirectToRoute('home');
+
+                return $this->redirectToRoute('home');
             } catch (UserNotFoundException $userNotFoundException) {
                 $this->addFlash('Error', 'User not found');
 
@@ -85,7 +86,7 @@ class UserController extends AbstractController
         } else {
             $this->addFlash('Error', 'Please fill all fields');
 
-            return $this->redirectToRoute('courses');
+            return $this->redirectToRoute('login');
         }
     }
 }
