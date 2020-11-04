@@ -49,10 +49,11 @@ class UserManagerTest extends TestCase
     ) {
         $this->userRepository->expects($this->any())->method('usernameExists')->willReturn(false);
         $this->userRepository->expects($this->any())->method('emailExists')->willReturn(false);
+        $this->entityManager->expects($this->once())->method('persist')->with($user);
 
         $createdUser = $this->userManager->createUser($username, $email, $password);
-        $this->assertEquals($userVisit->getCounter(), $visitCounter);
-        $this->assertEquals($gottenCourse, $expectedCourse);
+        $this->assertNotNull($createdUser->getPassword());
+
     }
 
     /**
@@ -81,32 +82,12 @@ class UserManagerTest extends TestCase
     public function createUserProvider(): array
     {
         return [
-            'User has visits left' =>
+            'Normal User Registration' =>
                 [
-                    (new User),
-                    (new Course)->setName('Tarator')->setUrl('youtube123'),
-                    (new Course)->setName('Tarator')->setUrl('youtube123'),
-                    (new UserVisit())->setCounter(5)->setLastVisit(new DateTimeImmutable('2020-10-10')),
-                    6,
-                    false,
-                ],
-            'User has no visits left' =>
-                [
-                    (new User),
-                    (new Course)->setName('Tarator')->setUrl('youtube123'),
-                    (new Course)->setName('Tarator')->setUrl(null),
-                    (new UserVisit())->setCounter(10)->setLastVisit(new DateTimeImmutable('2020-10-10')),
-                    10,
-                    false,
-                ],
-            'User not visited in days' =>
-                [
-                    (new User),
-                    (new Course)->setName('Tarator')->setUrl('youtube123'),
-                    (new Course)->setName('Tarator')->setUrl('youtube123'),
-                    (new UserVisit())->setCounter(10)->setLastVisit(new DateTimeImmutable('2020-05-05')),
-                    1,
-                    false,
+                    'gotvach_sf',
+                    'dev_recepti@abv.bg',
+                    'sudo123',
+                    (new User())->setEmail('dev_recepti@abv.bg')->setUsername('gotvach_sf')
                 ],
         ];
     }
