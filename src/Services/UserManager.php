@@ -7,7 +7,6 @@ namespace App\Services;
 use App\Entity\User;
 use App\Exceptions\UserAlreadyExistsException;
 use App\Repository\UserRepository;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 
 class UserManager
@@ -34,6 +33,11 @@ class UserManager
         }
     }
 
+    public function hashPassword(string $password): string
+    {
+        return password_hash($password, PASSWORD_ARGON2ID);
+    }
+
     private function userDoesNotExist(User $user): bool
     {
         return
@@ -41,11 +45,6 @@ class UserManager
                 $this->userRepository->usernameExists($user->getUsername())
                 || $this->userRepository->emailExists($user->getEmail())
             )
-        ;
-    }
-
-    public function hashPassword(string $password): string
-    {
-        return password_hash($password, PASSWORD_ARGON2ID);
+            ;
     }
 }
