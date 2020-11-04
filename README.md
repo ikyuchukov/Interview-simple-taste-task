@@ -29,3 +29,10 @@
 * Register at http://127.0.0.1:8080/register
 * Login at http://127.0.0.1:8080/login
 * Courses are available at http://127.0.0.1:8080/home    
+
+* To set your user as admin you can run the following query (change id accordingly)
+
+        INSERT INTO taste.user_roles
+        (user_id, `role`)
+        VALUES(1, 'admin');
+
