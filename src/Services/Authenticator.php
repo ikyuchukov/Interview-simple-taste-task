@@ -28,6 +28,8 @@ class Authenticator
         if ($user !== null && password_verify($password, $user->getPassword())) {
             $session = new Session(new NativeSessionStorage(), new AttributeBag());
             $session->set('user_id', $user->getId());
+            $session->set('username', $user->getUsername());
+            $session->set('logged_in', true);
         } else {
             throw new UserNotFoundException('No User with provided email/pass combination found.');
         }
