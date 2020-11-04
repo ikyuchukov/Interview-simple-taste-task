@@ -27,7 +27,7 @@ class UserRepository extends ServiceEntityRepository
             ->setParameter('email', $email)
             ->setMaxResults(1)
             ->getQuery()
-            ->getScalarResult()
+            ->getSingleScalarResult()
         ;
 
         return (bool) $result;
@@ -41,7 +41,7 @@ class UserRepository extends ServiceEntityRepository
             ->setParameter('username', $username)
             ->setMaxResults(1)
             ->getQuery()
-            ->getScalarResult()
+            ->getSingleScalarResult()
         ;
 
         return (bool) $result;

@@ -26,6 +26,8 @@ class UserManager
         if ($this->userDoesNotExist($user)) {
             $this->entityManager->persist($user);
             $user->setPassword(password_hash($password, PASSWORD_ARGON2ID));
+
+            return $user;
         } else {
             throw new UserAlreadyExistsException('User already exists');
         }

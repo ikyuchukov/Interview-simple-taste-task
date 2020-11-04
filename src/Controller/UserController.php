@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Exceptions\UserAlreadyExistsException;
 use App\Services\UserDataValidation;
 use App\Services\UserManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,11 +18,16 @@ class UserController extends AbstractController
 {
     private UserManager $userManager;
     private UserDataValidation $userDataValidation;
+    private EntityManagerInterface $entityManager;
 
-    public function __construct(UserManager $userManager, UserDataValidation $userDataValidation)
-    {
+    public function __construct(
+        UserManager $userManager,
+        UserDataValidation $userDataValidation,
+        EntityManagerInterface $entityManager
+    ) {
         $this->userManager = $userManager;
         $this->userDataValidation = $userDataValidation;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -37,11 +43,19 @@ class UserController extends AbstractController
             $user = (new User())->setUsername($userData['username'])->setEmail($userData['email']);
             try {
                 $this->userManager->createUser($user, $userData['password']);
+                $this->entityManager->flush();
+                $this->addFlash('Message', 'Registration successfull');
+
+                return $this->redirectToRoute('login');
             } catch (UserAlreadyExistsException $userAlreadyExistsException) {
-                $this->redirect('/register', 400);
+                $this->addFlash('Error', 'User already exists');
+
+                return $this->redirectToRoute('register');
             }
         } else {
-            $this->redirect('/register', 400);
+            $this->addFlash('Error', 'Please fill all fields');
+
+            return $this->redirectToRoute('register');
         }
     }
 }
