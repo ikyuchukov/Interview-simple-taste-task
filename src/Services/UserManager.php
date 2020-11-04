@@ -21,11 +21,12 @@ class UserManager
         $this->entityManager = $entityManager;
     }
 
-    public function createUser(User $user, string $password): User
+    public function createUser(string $username, string $email, string $password): User
     {
+        $user = (new User())->setUsername($username)->setEmail($email);
         if ($this->userDoesNotExist($user)) {
             $this->entityManager->persist($user);
-            $user->setPassword(password_hash($password, PASSWORD_ARGON2ID));
+            $user->setPassword($this->hashPassword($password));
 
             return $user;
         } else {
@@ -41,5 +42,10 @@ class UserManager
                 || $this->userRepository->emailExists($user->getEmail())
             )
         ;
+    }
+
+    public function hashPassword(string $password): string
+    {
+        return password_hash($password, PASSWORD_ARGON2ID);
     }
 }

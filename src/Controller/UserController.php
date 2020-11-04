@@ -6,6 +6,8 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Exceptions\UserAlreadyExistsException;
+use App\Exceptions\UserNotFoundException;
+use App\Services\Authenticator;
 use App\Services\UserDataValidation;
 use App\Services\UserManager;
 use Doctrine\ORM\EntityManagerInterface;
@@ -19,15 +21,18 @@ class UserController extends AbstractController
     private UserManager $userManager;
     private UserDataValidation $userDataValidation;
     private EntityManagerInterface $entityManager;
+    private Authenticator $authenticator;
 
     public function __construct(
         UserManager $userManager,
         UserDataValidation $userDataValidation,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        Authenticator $authenticator
     ) {
         $this->userManager = $userManager;
         $this->userDataValidation = $userDataValidation;
         $this->entityManager = $entityManager;
+        $this->authenticator = $authenticator;
     }
 
     /**
@@ -40,11 +45,10 @@ class UserController extends AbstractController
     {
         $userData = $request->request->get('user_register');
         if ($this->userDataValidation->isUserRegistrationDataValid($userData)) {
-            $user = (new User())->setUsername($userData['username'])->setEmail($userData['email']);
             try {
-                $this->userManager->createUser($user, $userData['password']);
+                $this->userManager->createUser($userData['username'], $userData['email'], $userData['password']);
                 $this->entityManager->flush();
-                $this->addFlash('Message', 'Registration successfull');
+                $this->addFlash('Message', 'Registration successful');
 
                 return $this->redirectToRoute('login');
             } catch (UserAlreadyExistsException $userAlreadyExistsException) {
@@ -56,6 +60,32 @@ class UserController extends AbstractController
             $this->addFlash('Error', 'Please fill all fields');
 
             return $this->redirectToRoute('register');
+        }
+    }
+
+    /**
+     * @Route("/loginUser", name="loginUser")
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function loginUser(Request $request): Response
+    {
+        $userData = $request->request->get('user_login');
+        if ($this->userDataValidation->isUserLoginDataValid($userData)) {
+            try {
+                $this->authenticator->authenticateUser($userData['email'], $userData['password']);
+                $this->redirectToRoute('home');
+            } catch (UserNotFoundException $userNotFoundException) {
+                $this->addFlash('Error', 'User not found');
+
+                return $this->redirectToRoute('login');
+            }
+
+        } else {
+            $this->addFlash('Error', 'Please fill all fields');
+
+            return $this->redirectToRoute('courses');
         }
     }
 }

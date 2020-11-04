@@ -17,7 +17,7 @@ class UserLogin extends AbstractType
         $builder
             ->add('email', TextType::class)
             ->add('password', PasswordType::class)
-            ->add('save', SubmitType::class)
+            ->add('login', SubmitType::class)
             ->setAction('/loginUser')
             ->setMethod('POST')
         ;

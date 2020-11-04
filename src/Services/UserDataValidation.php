@@ -20,4 +20,16 @@ class UserDataValidation
 
         return true;
     }
+
+    public function isUserLoginDataValid(array $userData): bool
+    {
+        if (empty($data['email'])) {
+            return false;
+        }
+        if (empty($data['password'])) {
+            return false;
+        }
+
+        return true;
+    }
 }
