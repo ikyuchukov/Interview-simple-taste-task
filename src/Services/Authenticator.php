@@ -13,6 +13,8 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class Authenticator
 {
+    const SESSION_USER_ID = 'user_id';
+
     private UserRepository $userRepository;
     private UserManager $userManager;
     private SessionInterface $session;
@@ -36,8 +38,6 @@ class Authenticator
 
         if ($user !== null && password_verify($password, $user->getPassword())) {
             $this->session->set('user_id', $user->getId());
-            $this->session->set('username', $user->getUsername());
-            $this->session->set('logged_in', true);
         } else {
             throw new UserNotFoundException('No User with provided email/pass combination found.');
         }
@@ -45,7 +45,7 @@ class Authenticator
 
     public function getLoggedUser(): User
     {
-        $userId = $this->session->get('user_id');
+        $userId = $this->session->get(self::SESSION_USER_ID);
         if ($userId === null) {
             throw new UserNotLoggedException('User isn\'t currently logged.');
         }
@@ -55,10 +55,10 @@ class Authenticator
 
     public function isUserAuthenticated(): bool
     {
-        return $this->session->get('logged_in');
+        return $this->session->get(self::SESSION_USER_ID) === true;
     }
 
-    public function isUserAdmin(User $user)
+    public function isUserAdmin(User $user): bool
     {
         return $this->userRolesRepository->isAdmin($user);
     }
