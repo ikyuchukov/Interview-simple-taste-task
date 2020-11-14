@@ -1,0 +1,5 @@
+App\Entity\User:
+  genus_{1..10}:
+    username: <name()>
+    email: <email()>
+    password: <password()>
