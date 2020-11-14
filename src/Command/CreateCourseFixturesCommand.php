@@ -35,21 +35,13 @@ class CreateCourseFixturesCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $numberOfFixturesToCreate = $input->getArgument('amount') ?? self::NUMBER_OF_FIXTURES_TO_CREATE;
-//        $courseFixtures = $this->fixturesLoader->loadData([
-//            Course::class => [
-//                sprintf('course{1..%s}', $numberOfFixturesToCreate) => [
-//                    'name (unique)' => '<username()><current()>',
-//                    'url (unique)' => 'https://youtube.com/watch?v=<uuid()><current()>',
-//                ],
-//            ],
-//        ]);
-        $userFixtures = $this->fixturesLoader->loadFile('src/Fixtures/Resources/user.yml');
+        $courseFixtures = $this->fixturesLoader->loadFile('src/Fixtures/Resources/course.yml');
 
-        foreach ($userFixtures->getObjects() as $course) {
+        foreach ($courseFixtures->getObjects() as $course) {
             $this->entityManager->persist($course);
         }
         $this->entityManager->flush();
+        $output->writeln(sprintf('Inserted %s courses', count($courseFixtures->getObjects())));
 
         return Command::SUCCESS;
     }

@@ -1,0 +1,4 @@
+App\Entity\Course:
+  genus_{1..10}:
+    name (unique): <username()>,
+    url (unique): https://youtube.com/watch?v=<uuid()>,
