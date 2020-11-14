@@ -9,6 +9,11 @@
 </style>
 
 <div class="example-wrapper">
+    {% for message in app.flashes('Message') %}
+        <div class="flash-notice">
+            {{ message }}
+        </div>
+    {% endfor %}
     <h1>Hello Non-cooking dev!</h1>
     {{ form(form) }}
 </div>
