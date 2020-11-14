@@ -2,12 +2,9 @@
 
 namespace App\Tests;
 
-use App\Entity\Course;
 use App\Entity\User;
-use App\Entity\UserVisit;
 use App\Exceptions\UserAlreadyExistsException;
 use App\Repository\UserRepository;
-use App\Repository\UserVisitRepository;
 use App\Services\UserManager;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
@@ -73,8 +70,8 @@ class UserManagerTest extends TestCase
         bool $usernameExists,
         bool $emailExists
     ) {
-        $this->userRepository->expects($this->any())->method('usernameExists')->willReturn(true);
-        $this->userRepository->expects($this->any())->method('emailExists')->willReturn(true);
+        $this->userRepository->expects($this->any())->method('usernameExists')->willReturn($usernameExists);
+        $this->userRepository->expects($this->any())->method('emailExists')->willReturn($emailExists);
         $this->expectException(UserAlreadyExistsException::class);
         $this->userManager->createUser($username, $email, $password);
     }
