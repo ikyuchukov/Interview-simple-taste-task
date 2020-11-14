@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Entity\Course;
 use App\Entity\User;
 use App\Entity\UserVisit;
+use App\Exceptions\CourseNotFoundException;
 use App\Repository\CourseRepository;
 use App\Repository\UserVisitRepository;
 use DateInterval;
@@ -39,14 +40,26 @@ class CourseManager
         $this->currentDate = $currentDate;
     }
 
+    /**
+     * @param User $user
+     * @param int $courseId
+     *
+     * @return Course
+     * @throws CourseNotFoundException
+     */
     public function getCourseForUser(User $user, int $courseId): Course
     {
+        $course = $this->courseRepository->find($courseId);
+        if ($course === null) {
+            throw new CourseNotFoundException(sprintf('Course %s not found.', $courseId));
+        }
+
         if ($this->canUserSeeCourse($user)) {
             $this->createUserVisit($user);
 
-            return $this->courseRepository->find($courseId);
+            return $course;
         } else {
-            return (new Course)->setName($this->courseRepository->find($courseId)->getName());
+            return (new Course)->setName($course->getName());
         }
     }
 

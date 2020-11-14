@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Exceptions\CourseNotFoundException;
 use App\Exceptions\UserNotLoggedException;
 use App\Repository\CourseRepository;
 use App\Services\Authenticator;
@@ -42,10 +43,18 @@ class CourseController extends AbstractController
     public function course(int $id): Response
     {
         if ($this->authenticator->isUserAuthenticated()) {
-            $course = $this->courseManager->getCourseForUser($this->authenticator->getLoggedUser(), $id);
-            $this->entityManager->flush();
+            try {
+                $course = $this->courseManager->getCourseForUser($this->authenticator->getLoggedUser(), $id);
+                $this->entityManager->flush();
 
-            return $this->render('courses/course.html.twig', ['course' => $course]);
+                return $this->render('courses/course.html.twig', ['course' => $course]);
+            } catch (CourseNotFoundException $courseNotFoundException) {
+                return
+                    $this->render(
+                        'courses/not_found.html.twig',
+                        ['errorMessage' => $courseNotFoundException->getMessage()]
+                );
+            }
         } else {
             return $this->redirectToRoute('home');
         }

@@ -55,7 +55,7 @@ class Authenticator
 
     public function isUserAuthenticated(): bool
     {
-        return $this->session->get(self::SESSION_USER_ID) === true;
+        return $this->session->get(self::SESSION_USER_ID) !== null;
     }
 
     public function isUserAdmin(User $user): bool
