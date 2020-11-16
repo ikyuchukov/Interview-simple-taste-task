@@ -53,7 +53,8 @@ class CreateUserFixturesCommand extends Command
                 $this->userPasswordEncoder->encodePassword(
                     $user,
                     $user->getPassword())
-            );
+            )->setRoles([User::ROLE_VIEWER])
+            ;
             $this->entityManager->persist($user);
         }
 

@@ -1,6 +1,3 @@
-register:
-    path: /register
-    controller: App\Controller\PageController::register
 index:
     path: /
     controller: App\Controller\PageController::home

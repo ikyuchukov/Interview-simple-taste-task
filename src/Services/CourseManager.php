@@ -14,11 +14,11 @@ use DateInterval;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class CourseManager
 {
     private CourseRepository $courseRepository;
-    private Authenticator $authenticator;
     private UserVisitRepository $userVisitRepository;
     private EntityManagerInterface $entityManager;
     private ContainerBagInterface $params;
@@ -26,14 +26,12 @@ class CourseManager
 
     public function __construct(
         CourseRepository $courseRepository,
-        Authenticator $authenticator,
         UserVisitRepository $userVisitRepository,
         EntityManagerInterface $entityManager,
         ContainerBagInterface $params,
         DateTimeImmutable $currentDate
     ) {
         $this->courseRepository = $courseRepository;
-        $this->authenticator = $authenticator;
         $this->userVisitRepository = $userVisitRepository;
         $this->entityManager = $entityManager;
         $this->params = $params;
@@ -53,22 +51,14 @@ class CourseManager
         if ($course === null) {
             throw new CourseNotFoundException(sprintf('Course %s not found.', $courseId));
         }
+        $this->createUserVisit($user);
 
-        if ($this->canUserSeeCourse($user)) {
-            $this->createUserVisit($user);
 
-            return $course;
-        } else {
-            return (new Course)->setName($course->getName());
-        }
+        return $course;
+
     }
 
-    public function canUserSeeCourse(User $user): bool
-    {
-        return $this->authenticator->isUserAdmin($user) || $this->hasVisitsLeft($user);
-    }
-
-    private function hasVisitsLeft(User $user): bool
+    public function hasVisitsLeft(UserInterface $user): bool
     {
         $userVisit = $this->userVisitRepository->findOneBy(['user' => $user]);
 

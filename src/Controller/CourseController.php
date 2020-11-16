@@ -4,31 +4,33 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Entity\Course;
 use App\Exceptions\CourseNotFoundException;
-use App\Exceptions\UserNotLoggedException;
 use App\Repository\CourseRepository;
-use App\Services\Authenticator;
+use App\Security\CourseVoter;
 use App\Services\CourseManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class CourseController extends AbstractController
 {
     private CourseRepository $coursesRepository;
-    private Authenticator $authenticator;
+    private AuthorizationCheckerInterface $authorizationChecker;
     private CourseManager $courseManager;
     private EntityManagerInterface $entityManager;
 
     public function __construct(
         CourseRepository $coursesRepository,
-        Authenticator $authenticator,
+        AuthorizationCheckerInterface $authorizationChecker,
         CourseManager $courseManager,
         EntityManagerInterface $entityManager
     ) {
         $this->coursesRepository = $coursesRepository;
-        $this->authenticator = $authenticator;
+        $this->authorizationChecker = $authorizationChecker;
         $this->courseManager = $courseManager;
         $this->entityManager = $entityManager;
     }
@@ -38,13 +40,12 @@ class CourseController extends AbstractController
      * @param int $id
      *
      * @return Response
-     * @throws UserNotLoggedException
      */
     public function course(int $id): Response
     {
-        if ($this->authenticator->isUserAuthenticated()) {
+        if($this->isGranted(CourseVoter::COURSE_VIEWING)) {
             try {
-                $course = $this->courseManager->getCourseForUser($this->authenticator->getLoggedUser(), $id);
+                $course = $this->courseManager->getCourseForUser($this->getUser(), $id);
                 $this->entityManager->flush();
 
                 return $this->render('courses/course.html.twig', ['course' => $course]);
@@ -56,7 +57,18 @@ class CourseController extends AbstractController
                 );
             }
         } else {
-            return $this->redirectToRoute('home');
+            $course = $this->coursesRepository->find($id);
+            if ($course !== null) {
+                return $this->render('courses/course.html.twig', [
+                    'course' => (new Course)->setName($course->getName())
+                ]);
+            }
+
+            return
+                $this->render(
+                    'courses/not_found.html.twig',
+                    ['errorMessage' => 'Course not found.']
+                );
         }
     }
 }
