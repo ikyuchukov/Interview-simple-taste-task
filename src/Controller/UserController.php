@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Exceptions\UserAlreadyExistsException;
 use App\Exceptions\UserNotFoundException;
+use App\Form\UserLogin;
+use App\Form\UserRegister;
 use App\Services\Authenticator;
 use App\Services\UserDataValidation;
 use App\Services\UserManager;
@@ -43,18 +46,22 @@ class UserController extends AbstractController
     public function createUser(Request $request): Response
     {
         $userData = $request->request->get('user_register');
-        if ($this->userDataValidation->isUserRegistrationDataValid($userData)) {
+        $userRegister = new UserRegister();
+        $form = $this->createForm(UserRegister::class, $userRegister);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
             try {
                 $this->userManager->createUser($userData['username'], $userData['email'], $userData['password']);
-                $this->entityManager->flush();
-                $this->addFlash('Message', 'Registration successful');
+                    $this->entityManager->flush();
+                    $this->addFlash('Message', 'Registration successful');
 
-                return $this->redirectToRoute('login');
-            } catch (UserAlreadyExistsException $userAlreadyExistsException) {
-                $this->addFlash('Error', 'User already exists');
+                    return $this->redirectToRoute('login');
+                } catch (UserAlreadyExistsException $userAlreadyExistsException) {
+                    $this->addFlash('Error', 'User already exists');
 
                 return $this->redirectToRoute('register');
-            }
+                }
         } else {
             $this->addFlash('Error', 'Please fill all fields');
 
