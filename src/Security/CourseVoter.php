@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Security;
 
-use App\Entity\Course;
 use App\Entity\User;
 use App\Services\CourseManager;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
