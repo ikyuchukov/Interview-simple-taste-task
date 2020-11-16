@@ -14,11 +14,6 @@ class UserManager
     private UserRepository $userRepository;
     private EntityManagerInterface $entityManager;
 
-    public function __construct(UserRepository $userRepository, EntityManagerInterface $entityManager)
-    {
-        $this->userRepository = $userRepository;
-        $this->entityManager = $entityManager;
-    }
 
     public function createUser(string $username, string $email, string $password): User
     {

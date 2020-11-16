@@ -21,26 +21,6 @@ class PageController extends AbstractController
     }
 
     /**
-     * @Route("/login", name="login")
-     */
-    public function login(): Response
-    {
-        $form = $this->createForm(UserLogin::class);
-
-        return $this->render('authentication/login.html.twig', ['form' => $form->createView()]);
-    }
-
-    /**
-     * @Route("/register", name="register")
-     */
-    public function register(): Response
-    {
-        $form = $this->createForm(UserRegister::class);
-
-        return $this->render('authentication/register.html.twig', ['form' => $form->createView()]);
-    }
-
-    /**
      * @Route("/home", name="home")
      */
     public function home(): Response

@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace App\Command;
 
 use App\Entity\User;
-use App\Services\UserManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Nelmio\Alice\Loader\NativeLoader;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class CreateUserFixturesCommand extends Command
 {
@@ -18,13 +19,15 @@ class CreateUserFixturesCommand extends Command
 
     private EntityManagerInterface $entityManager;
     private NativeLoader $fixturesLoader;
-    private UserManager $userManager;
+    private UserPasswordEncoderInterface $userPasswordEncoder;
 
-    public function __construct(EntityManagerInterface $entityManager, UserManager $userManager)
-    {
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        UserPasswordEncoderInterface $userPasswordEncoder
+    ) {
         $this->entityManager = $entityManager;
+        $this->userPasswordEncoder = $userPasswordEncoder;
         $this->fixturesLoader = new NativeLoader();
-        $this->userManager = $userManager;
         parent::__construct();
     }
 
@@ -46,7 +49,11 @@ class CreateUserFixturesCommand extends Command
                     $user->getPassword())
             )
             ;
-            $user->setPassword($this->userManager->hashPassword($user->getPassword()));
+            $user->setPassword(
+                $this->userPasswordEncoder->encodePassword(
+                    $user,
+                    $user->getPassword())
+            );
             $this->entityManager->persist($user);
         }
 
