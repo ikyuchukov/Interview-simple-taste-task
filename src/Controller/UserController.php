@@ -6,6 +6,7 @@ namespace App\Controller;
 
 use App\Exceptions\UserAlreadyExistsException;
 use App\Exceptions\UserNotFoundException;
+use App\Form\UserLogin;
 use App\Form\UserRegister;
 use App\Services\Authenticator;
 use App\Services\UserDataValidation;
@@ -79,10 +80,14 @@ class UserController extends AbstractController
      */
     public function loginUser(Request $request): Response
     {
-        $userData = $request->request->get('user_login');
-        if ($this->userDataValidation->isUserLoginDataValid($userData)) {
+        $userLogin = new UserLogin();
+        $form = $this->createForm(UserLogin::class, $userLogin);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
             try {
-                $this->authenticator->authenticateUser($userData['email'], $userData['password']);
+                $userData = $form->getData();
+                $this->authenticator->authenticateUser($userData->getEmail(), $userData->getPassword());
 
                 return $this->redirectToRoute('home');
             } catch (UserNotFoundException $userNotFoundException) {
